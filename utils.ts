@@ -7,20 +7,16 @@ export const VerifyDiscordRequest = (clientKey: string) => {
   }
 
   return function (req: Request, res: Response, buf: Uint8Array) {
-    const signature = req.get("X-Signature-Ed25519");
-    const timestamp = req.get("X-Signature-Timestamp");
-
-    if (!signature) {
-      throw new Error("Missing signature");
-    }
-
-    if (!timestamp) {
-      throw new Error("Missing timestamp");
-    }
+    const signature = req.get("X-Signature-Ed25519") || "";
+    const timestamp = req.get("X-Signature-Timestamp") || "";
 
     const isValidRequest = verifyKey(buf, signature, timestamp, clientKey);
     if (!isValidRequest) {
-      res.status(401).send("Bad request signature");
+      res
+        .status(401)
+        .send(
+          "Bad request signature"
+        );
       throw new Error("Bad request signature");
     }
   };
